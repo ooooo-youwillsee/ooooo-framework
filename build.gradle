@@ -1,0 +1,38 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.15' apply false
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+    }
+
+    // @see https://github.com/spring-gradle-plugins/dependency-management-plugin
+    dependencyManagement {
+        imports {
+            mavenBom 'org.springframework.boot:spring-boot-starter-parent:2.6.15'
+        }
+        dependencies {
+            dependency 'com.alibaba:fastjson:1.2.83'
+            dependency 'cn.hutool:hutool-all:5.7.22'
+            dependency 'org.apache.dubbo:dubbo:3.1.11'
+            dependency 'org.apache.curator:curator-x-discovery:4.2.0'
+            dependency 'org.apache.dubbo:dubbo-spring-boot-starter:3.1.11'
+        }
+    }
+
+    dependencies {
+        compileOnly('org.projectlombok:lombok:1.18.26')
+        testCompileOnly('org.projectlombok:lombok:1.18.26')
+        annotationProcessor('org.projectlombok:lombok:1.18.26')
+        testAnnotationProcessor('org.projectlombok:lombok:1.18.26')
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}

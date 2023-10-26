@@ -1,0 +1,13 @@
+rootProject.name = 'infra'
+
+include 'infra-api'
+include 'infra-auth'
+include 'infra-cache'
+include 'infra-config'
+include 'infra-context'
+include 'infra-db'
+include 'infra-dev'
+include 'infra-lock'
+include 'infra-mq'
+include 'infra-trace'
+include 'infra-web'
