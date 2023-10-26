@@ -1,0 +1,10 @@
+dependencies {
+    api(project(":infra-context"))
+
+    api('io.jsonwebtoken:jjwt')
+    api('com.auth0:java-jwt:3.19.0')
+    api('org.springframework.boot:spring-boot-starter-web')
+    api('org.springframework.boot:spring-boot-starter-security')
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
