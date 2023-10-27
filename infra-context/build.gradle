@@ -1,6 +1,6 @@
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation('cn.hutool:hutool-all')
+    api('cn.hutool:hutool-all')
 
     testImplementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

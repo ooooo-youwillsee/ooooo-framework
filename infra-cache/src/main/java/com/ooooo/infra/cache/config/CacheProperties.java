@@ -3,6 +3,11 @@ package com.ooooo.infra.cache.config;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.convert.DurationFormat;
+import org.springframework.boot.convert.DurationUnit;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static com.ooooo.infra.cache.config.CacheProperties.PREFIX_CACHE;
 
@@ -19,5 +24,5 @@ public class CacheProperties {
 
   private String prefix;
 
-
+  private Duration ttl = Duration.ofHours(12);
 }

@@ -4,7 +4,9 @@ import com.ooooo.infra.auth.endpoint.*;
 import com.ooooo.infra.auth.helper.JwtHelper;
 import com.ooooo.infra.auth.helper.SM4Helper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +31,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 @EnableConfigurationProperties(WebSecurityProperties.class)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@AutoConfigureAfter(SecurityFilterAutoConfiguration.class)
+public class WebSecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
 
   @Autowired
   private WebSecurityProperties webSecurityProperties;

@@ -6,6 +6,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="https://github.com/ooooo-youwillsee">ooooo</a>
@@ -30,9 +31,29 @@ public class CacheServices implements CacheService {
       return null;
     }
     for (CacheService cacheService : cacheServices) {
-      T t = cacheService.get(key, clazz);
-      if (t != null) {
-        return t;
+      T v = cacheService.get(key, clazz);
+      if (v != null) {
+        return v;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public <T> T get(String key, Class<T> clazz, Supplier<T> supplier) {
+    if (cacheServices == null) {
+      return null;
+    }
+    for (CacheService cacheService : cacheServices) {
+      T v;
+      try {
+        v = cacheService.get(key, clazz, supplier);
+      } catch (Exception e) {
+        log.warn("'{}' cache get key '{}' error", cacheService.getName(), key);
+        continue;
+      }
+      if (v != null) {
+        return v;
       }
     }
     return null;
@@ -54,6 +75,20 @@ public class CacheServices implements CacheService {
     }
     if (!success) {
       throw new RuntimeException("cache set key '" + key + "' error");
+    }
+  }
+
+  @Override
+  public void delete(String key) {
+    if (cacheServices == null) {
+      return;
+    }
+    for (CacheService cacheService : cacheServices) {
+      try {
+        cacheService.delete(key);
+      } catch (Exception e) {
+        log.warn("'{}' cache delete key '{}' error", cacheService.getName(), key);
+      }
     }
   }
 
