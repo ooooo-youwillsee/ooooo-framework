@@ -1,8 +1,8 @@
 package com.ooooo.infra.auth.config;
 
-import com.ooooo.infra.auth.endpoint.AccessTokenFilter;
-import com.ooooo.infra.auth.endpoint.AuthorizationEndpoint;
-import com.ooooo.infra.auth.service.SecurityService;
+import com.ooooo.infra.auth.endpoint.*;
+import com.ooooo.infra.auth.helper.JwtHelper;
+import com.ooooo.infra.auth.helper.SM4Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -30,71 +30,83 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity(securedEnabled = true)
 @EnableConfigurationProperties(WebSecurityProperties.class)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	
-	@Autowired
-	private WebSecurityProperties webSecurityProperties;
-	
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.ignoring()
-				.mvcMatchers("/authless/**")
-				.mvcMatchers(AuthorizationEndpoint.TOKEN_URL)
-				.and()
-		;
 
-		for (String ignoreUrl : webSecurityProperties.getIgnoreUrls()) {
-			web.ignoring().mvcMatchers(ignoreUrl);
-		}
-	}
-	
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().anyRequest().authenticated().and()
-		    .httpBasic().disable()
-		    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-		    .csrf().disable()
-		    .cors(Customizer.withDefaults())
-		    .anonymous().disable()
-		    .addFilterBefore(accessTokenFilter(), UsernamePasswordAuthenticationFilter.class)
-		    .exceptionHandling()
-		    .authenticationEntryPoint(invalidTokenAuthenticationEntryPoint())
-		    .accessDeniedHandler(noPermissonAccessDeniedHandler()).and()
-		;
-	}
-	
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// override, then config
-		auth.inMemoryAuthentication();
-	}
-	
-	@Bean
-	public AccessTokenFilter accessTokenFilter() {
-		return new AccessTokenFilter();
-	}
-	
-	@Bean
-	@ConditionalOnMissingBean
-	public SecurityService defaultSecurityService() {
-		return new DefaultSecurityService();
-	}
-	
-	@Bean
-	@ConditionalOnMissingBean
-	public NoPermissionAccessDeniedHandler noPermissonAccessDeniedHandler() {
-		return new NoPermissionAccessDeniedHandler();
-	}
-	
-	@Bean
-	@ConditionalOnMissingBean
-	public InvalidTokenAuthenticationEntryPoint invalidTokenAuthenticationEntryPoint() {
-		return new InvalidTokenAuthenticationEntryPoint();
-	}
-	
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
-	
+  @Autowired
+  private WebSecurityProperties webSecurityProperties;
+
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    web.ignoring()
+        .mvcMatchers("/authless/**")
+        .mvcMatchers(AuthorizeEndpoint.TOKEN_URL)
+        .and()
+    ;
+
+    for (String ignoreUrl : webSecurityProperties.getIgnoreUrls()) {
+      web.ignoring().mvcMatchers(ignoreUrl);
+    }
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.authorizeRequests().anyRequest().authenticated().and()
+        .httpBasic().disable()
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+        .csrf().disable()
+        .cors(Customizer.withDefaults())
+        .anonymous().disable()
+        .addFilterBefore(authenticateFilter(), UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling()
+        .authenticationEntryPoint(invalidTokenAuthenticationEntryPoint())
+        .accessDeniedHandler(noPermissonAccessDeniedHandler()).and()
+    ;
+  }
+
+  @Override
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    // override, then config
+    auth.inMemoryAuthentication();
+  }
+
+  @Bean
+  public AuthenticateFilter authenticateFilter() {
+    return new AuthenticateFilter();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public NoPermissionAccessDeniedHandler noPermissonAccessDeniedHandler() {
+    return new NoPermissionAccessDeniedHandler();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public InvalidTokenAuthenticationEntryPoint invalidTokenAuthenticationEntryPoint() {
+    return new InvalidTokenAuthenticationEntryPoint();
+  }
+
+  @Bean
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public SecurityServices securityServices() {
+    return new SecurityServices();
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public SM4Helper sm4Helper() {
+    SM4Properties sm4 = webSecurityProperties.getSm4();
+    return new SM4Helper(sm4.getMode(), sm4.getPadding(), sm4.getKey());
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public JwtHelper jwtTokenHelper() {
+    return new JwtHelper();
+  }
 }

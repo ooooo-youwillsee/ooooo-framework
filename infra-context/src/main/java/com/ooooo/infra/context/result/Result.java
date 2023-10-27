@@ -19,6 +19,8 @@ public class Result<T> {
 
   public static final String SUCCESS_MESSAGE = "OK";
 
+  public static final String ERROR_CODE = "-1";
+
   private String code;
 
   private String message;
@@ -35,5 +37,9 @@ public class Result<T> {
 
   public static <T> Result<T> fail(String code, String message) {
     return new Result<>(code, message, null);
+  }
+
+  public static <T> Result<T> fail( String message) {
+    return new Result<>("-1", message, null);
   }
 }
