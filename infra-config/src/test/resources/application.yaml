@@ -1,0 +1,6 @@
+ooooo:
+  config:
+    nacos:
+      enabled: true
+      server-addr: localhost
+      namespace: demo
