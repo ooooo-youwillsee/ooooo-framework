@@ -17,6 +17,7 @@ Infrastructure to set up spring boot application
 
 1. `spring cache` 存在的问题，`redis` 请求出错之后，无法继续查询数据库
 2. 提供 `CacheService` 操作缓存
+3. 提供 `@Cache` 注解
 
 - infra-context
 
@@ -27,3 +28,7 @@ Infrastructure to set up spring boot application
 - infra-test
 
 1. 提供 mock `dubbo` 接口, 包括 `provider` 和 `consumer`。
+
+- infra-config
+
+1. 提供 `ConfigDataUrlListener` 监听配置
