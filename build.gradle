@@ -21,11 +21,13 @@ allprojects {
             dependency 'cn.hutool:hutool-all:5.7.22'
             dependency 'com.auth0:java-jwt:3.19.0'
             dependency 'org.bouncycastle:bcprov-jdk15to18:1.73'
+            dependency 'mysql:mysql-connector-java:8.0.27'
             dependency 'org.apache.dubbo:dubbo:3.1.11'
             dependency 'com.alibaba.nacos:nacos-client:2.1.2'
             dependency 'org.apache.curator:curator-x-discovery:4.2.0'
             dependency 'org.apache.dubbo:dubbo-spring-boot-starter:3.1.11'
             dependency 'org.redisson:redisson-spring-boot-starter:3.17.7'
+            dependency 'com.baomidou:mybatis-plus-boot-starter:3.5.3'
         }
     }
 

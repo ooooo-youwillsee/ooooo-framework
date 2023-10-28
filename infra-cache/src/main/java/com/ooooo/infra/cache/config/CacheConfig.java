@@ -28,6 +28,7 @@ public class CacheConfig {
     return new CacheServices();
   }
 
+  @Configuration
   @ConditionalOnClass(RedisConnectionFactory.class)
   static class Redis {
 
