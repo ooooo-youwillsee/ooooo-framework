@@ -28,17 +28,30 @@ class CacheAspectTest {
 
   @BeforeEach
   void beforeEach() {
-    cacheService.delete("test1");
-    cacheService.delete("test2");
+    cacheService.delete("test1:0");
+    cacheService.delete("test1:1");
+    cacheService.delete("test2:0");
+    cacheService.delete("test2:1");
   }
 
   @Test
   void test1() {
+    // i = 0
     demoService.setCount(0);
-    String value = demoService.test1();
+    String value = demoService.test1(0);
+    assertThat(value).isEqualTo("value0");
+    assertThat(demoService.getCount()).isEqualTo(1);
+    value = demoService.test1(0);
+    assertThat(value).isEqualTo("value0");
+    assertThat(demoService.getCount()).isEqualTo(1);
+
+    // i = 1
+    value = demoService.test1(1);
+    assertThat(demoService.getCount()).isEqualTo(2);
     assertThat(value).isEqualTo("value1");
-    value = demoService.test1();
+    value = demoService.test1(1);
     assertThat(value).isEqualTo("value1");
+    assertThat(demoService.getCount()).isEqualTo(2);
   }
 
   @Test
@@ -46,16 +59,19 @@ class CacheAspectTest {
     // condition is true, so it will cache value
     demoService.setCount(0);
     String value = demoService.test2(0);
-    assertThat(value).isEqualTo("value1");
+    assertThat(value).isEqualTo("value0");
+    assertThat(demoService.getCount()).isEqualTo(1);
     value = demoService.test2(0);
-    assertThat(value).isEqualTo("value1");
+    assertThat(value).isEqualTo("value0");
+    assertThat(demoService.getCount()).isEqualTo(1);
 
     // condition is false, so it will not cache value
-    demoService.setCount(0);
     value = demoService.test2(1);
     assertThat(value).isEqualTo("value1");
+    assertThat(demoService.getCount()).isEqualTo(2);
     value = demoService.test2(2);
     assertThat(value).isEqualTo("value2");
+    assertThat(demoService.getCount()).isEqualTo(3);
   }
 
 

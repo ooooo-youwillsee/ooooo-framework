@@ -96,6 +96,7 @@ public class CacheAspect {
     return expressionParser.parse(condition, variables, Boolean.class);
   }
 
+  // todo CacheNameGenerator
   String generateName(Cache cache, Method method) {
     String name = cache.name();
     if (StrUtil.isBlank(name)) {
@@ -104,6 +105,7 @@ public class CacheAspect {
     return name;
   }
 
+  // todo CacheKeyGenerator
   String generateKey(Cache cache, Method method, Object[] args) {
     String key = cache.key();
     if (StrUtil.isBlank(key)) {
