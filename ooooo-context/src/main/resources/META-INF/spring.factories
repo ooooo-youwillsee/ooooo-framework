@@ -1,0 +1,6 @@
+org.springframework.context.ApplicationListener= \
+com.ooooo.framework.context.listener.WebServerInfoApplicationListener
+
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.ooooo.framework.context.config.ContextAutoConfiguration

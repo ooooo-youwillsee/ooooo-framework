@@ -1,0 +1,5 @@
+# Environment Post Processors
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.ooooo.framework.test.dubbo.DisableDubboEnvironmentPostProcessor, \
+com.ooooo.framework.test.dubbo.MockDubboReferenceAnnotationBeanDefinitionRegistryPostProcessor, \
+com.ooooo.framework.test.dubbo.MockDubboServiceBeanDefinitionRegistry

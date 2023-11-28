@@ -1,0 +1,12 @@
+dependencies {
+    api(project(":ooooo-context"))
+
+    api('com.auth0:java-jwt')
+    api('com.alibaba:fastjson')
+    api('cn.hutool:hutool-all')
+    api('org.bouncycastle:bcprov-jdk15to18')
+    api('org.springframework.boot:spring-boot-starter-web')
+    api('org.springframework.boot:spring-boot-starter-security')
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}

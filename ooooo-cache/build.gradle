@@ -1,0 +1,10 @@
+dependencies {
+    api(project(":ooooo-context"))
+
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation('org.redisson:redisson-spring-boot-starter')
+    implementation('com.alibaba:fastjson')
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}

@@ -1,8 +1,0 @@
-dependencies {
-    api(project(":infra-context"))
-
-    implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation('org.apache.dubbo:dubbo')
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
