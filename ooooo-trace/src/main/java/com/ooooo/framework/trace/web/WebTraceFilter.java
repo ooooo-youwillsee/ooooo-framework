@@ -3,8 +3,6 @@ package com.ooooo.framework.trace.web;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.utils.StringUtils;
@@ -12,7 +10,6 @@ import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -25,11 +22,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,14 +46,19 @@ public class WebTraceFilter extends OncePerRequestFilter implements OrderedFilte
     }
 
     Date startTime = new Date();
-    String requestUri = getRequestUri(requestWrapper);
     try {
-      noException(() -> logHTTPRequest(requestUri, requestWrapper));
       filterChain.doFilter(request, response);
     } finally {
       Date endTime = new Date();
-      noException(() -> logHTTPResponse(startTime, endTime, requestUri, responseWrapper));
+      noException(() -> logHTTP(startTime, endTime, requestWrapper, responseWrapper));
     }
+  }
+
+  private void logHTTP(Date startTime, Date endTime, ContentCachingRequestWrapper request, ContentCachingResponseWrapper response) {
+    String requestUri = getRequestUri(request);
+    long cost = endTime.getTime() - startTime.getTime();
+    logHTTPRequest(requestUri, request);
+    logHTTPResponse(requestUri, response, cost);
   }
 
   private void logHTTPRequest(String requestUri, ContentCachingRequestWrapper request) {
@@ -66,8 +66,7 @@ public class WebTraceFilter extends OncePerRequestFilter implements OrderedFilte
     log.info(String.format("HttpRequest[%s][%s][%s][%s][%d]:%s %s", request.getProtocol(), request.getMethod(), request.getContentType(), request.getCharacterEncoding(), request.getContentLengthLong(), requestUri, content));
   }
 
-  private void logHTTPResponse(Date startTime, Date endTime, String requestUri, ContentCachingResponseWrapper response) {
-    long cost = endTime.getTime() - startTime.getTime();
+  private void logHTTPResponse(String requestUri, ContentCachingResponseWrapper response, long cost) {
     String content = getContent(response);
     log.info(String.format("HttpResponse[%s][%s]:%s %dms %s", response.getStatus(), response.getContentType(), requestUri, cost, content));
   }
@@ -152,8 +151,7 @@ public class WebTraceFilter extends OncePerRequestFilter implements OrderedFilte
   @SneakyThrows
   private String handleApplicationJSON(ContentCachingRequestWrapper request) {
     String encoding = StrUtil.emptyToDefault(request.getCharacterEncoding(), StandardCharsets.UTF_8.name());
-    // todo read bug?
-    return IoUtil.read(request.getInputStream(), Charset.forName(encoding));
+    return new String(request.getContentAsByteArray(), Charset.forName(encoding));
   }
 
   private String handleApplicationJSON(ContentCachingResponseWrapper response) {

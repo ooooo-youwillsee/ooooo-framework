@@ -1,5 +1,6 @@
 package com.ooooo.framework.cache;
 
+import com.ooooo.framework.cache.exception.CacheOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
@@ -40,26 +41,6 @@ public class CacheServices implements CacheService {
   }
 
   @Override
-  public <T> T get(String key, Class<T> clazz, Supplier<T> supplier) {
-    if (cacheServices == null) {
-      return null;
-    }
-    for (CacheService cacheService : cacheServices) {
-      T v;
-      try {
-        v = cacheService.get(key, clazz, supplier);
-      } catch (Exception e) {
-        log.warn("'{}' cache get key '{}' error", cacheService.getName(), key);
-        continue;
-      }
-      if (v != null) {
-        return v;
-      }
-    }
-    return null;
-  }
-
-  @Override
   public void set(String key, Object value) {
     if (cacheServices == null) {
       return;
@@ -74,7 +55,7 @@ public class CacheServices implements CacheService {
       }
     }
     if (!success) {
-      throw new RuntimeException("cache set key '" + key + "' error");
+      throw new CacheOperationException("cache set key '" + key + "' error");
     }
   }
 

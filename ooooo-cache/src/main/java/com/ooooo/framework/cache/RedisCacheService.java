@@ -10,12 +10,13 @@ import java.util.function.Supplier;
 /**
  * @author <a href="https://github.com/ooooo-youwillsee">ooooo</a>
  * @since 1.0.0
+ * todo value serialization
  */
 public class RedisCacheService implements CacheService {
 
   private static final String NAME = "redis";
 
-  @Autowired()
+  @Autowired
   private StringRedisTemplate redisTemplate;
 
   @Autowired
@@ -30,17 +31,6 @@ public class RedisCacheService implements CacheService {
   public <T> T get(String key, Class<T> clazz) {
     String value = redisTemplate.opsForValue().get(prefixKey(key));
     return JSON.parseObject(value, clazz);
-  }
-
-  @Override
-  public <T> T get(String key, Class<T> clazz, Supplier<T> supplier) {
-    T v = get(key, clazz);
-    if (v != null) {
-      return v;
-    }
-    v = supplier.get();
-    set(key, v);
-    return v;
   }
 
   @Override

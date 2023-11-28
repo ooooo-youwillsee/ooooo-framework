@@ -12,8 +12,6 @@ public interface CacheService {
 
   <T> T get(String key, Class<T> clazz);
 
-  <T> T get(String key, Class<T> clazz, Supplier<T> supplier);
-
   void set(String key, Object value);
 
   void delete(String key);

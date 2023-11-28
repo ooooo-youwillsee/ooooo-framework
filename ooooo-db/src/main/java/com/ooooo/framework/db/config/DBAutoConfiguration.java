@@ -41,7 +41,7 @@ public class DBAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public MetaObjectHandler metaObjectHandler() {
+  public MetaObjectHandler timeMetaObjectHandler() {
     return new TimeMetaObjectHandler();
   }
 
