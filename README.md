@@ -38,3 +38,7 @@ Infrastructure to set up spring boot application
 1. 提供 `@MultiDataSource` 支持**动态数据源**
 2. 提供 `CheckMaxRowsInterceptor` 检查**最大条数**, 使用 `@DisableCheckMaxRows` 来禁止检查
 3. 提供 `TimeMetaObjectHandler` 自动填充 `create_time` 和 `update_time` 字段
+
+- ooooo-web
+
+1. 提供 `@DuplicatedSubmit` 防重复提交

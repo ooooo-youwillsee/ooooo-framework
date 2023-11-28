@@ -1,0 +1,9 @@
+dependencies {
+    api(project(":ooooo-context"))
+
+    api('org.springframework.boot:spring-boot-starter-web')
+    api("org.springframework.boot:spring-boot-starter-aop")
+    api('org.redisson:redisson-spring-boot-starter')
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
