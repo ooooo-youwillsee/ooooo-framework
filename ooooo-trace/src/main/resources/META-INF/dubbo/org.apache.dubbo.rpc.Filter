@@ -1,0 +1,1 @@
+dubboTrace=com.ooooo.framework.trace.dubbo.DubboTraceFilter

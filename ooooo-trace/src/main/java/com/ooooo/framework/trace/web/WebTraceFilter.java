@@ -1,8 +1,10 @@
 package com.ooooo.framework.trace.web;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.ooooo.framework.trace.constant.TraceConstant;
+import com.ooooo.framework.trace.util.TraceUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.utils.StringUtils;
@@ -50,25 +52,44 @@ public class WebTraceFilter extends OncePerRequestFilter implements OrderedFilte
       filterChain.doFilter(request, response);
     } finally {
       Date endTime = new Date();
-      noException(() -> logHTTP(startTime, endTime, requestWrapper, responseWrapper));
+      logHTTP(startTime, endTime, requestWrapper, responseWrapper);
     }
   }
 
   private void logHTTP(Date startTime, Date endTime, ContentCachingRequestWrapper request, ContentCachingResponseWrapper response) {
-    String requestUri = getRequestUri(request);
-    long cost = endTime.getTime() - startTime.getTime();
-    logHTTPRequest(requestUri, request);
-    logHTTPResponse(requestUri, response, cost);
+    try {
+      String traceId = getOrCreateTraceId(request);
+      String requestUri = getRequestUri(request);
+      long cost = endTime.getTime() - startTime.getTime();
+      logHTTPRequest(traceId, requestUri, request);
+      logHTTPResponse(traceId, requestUri, response, cost);
+    } catch (Throwable t) {
+      log.warn("日志打印失败，不影响调用, {}", t.getMessage());
+    }
   }
 
-  private void logHTTPRequest(String requestUri, ContentCachingRequestWrapper request) {
+  private String getOrCreateTraceId(ContentCachingRequestWrapper request) {
+    String traceId = TraceUtil.getTraceId();
+    traceId = StrUtil.emptyToDefault(traceId, request.getHeader(TraceConstant.TRACE_ID));
+    traceId = StrUtil.emptyToDefault(traceId, request.getParameter(TraceConstant.TRACE_ID));
+    traceId = StrUtil.emptyToDefault(traceId, (String) request.getAttribute(TraceConstant.TRACE_ID));
+    // generate a traceId
+    if (StrUtil.isBlank(traceId)) {
+      traceId = RandomUtil.randomString(6);
+    }
+    // reset traceId
+    TraceUtil.setTraceId(traceId);
+    return traceId;
+  }
+
+  private void logHTTPRequest(String traceId, String requestUri, ContentCachingRequestWrapper request) {
     String content = getContent(request);
-    log.info(String.format("HttpRequest[%s][%s][%s][%s][%d]:%s %s", request.getProtocol(), request.getMethod(), request.getContentType(), request.getCharacterEncoding(), request.getContentLengthLong(), requestUri, content));
+    log.info(String.format("HttpRequest[%s][%s][%s][%s][%s][%d]:%s %s", traceId, request.getProtocol(), request.getMethod(), request.getContentType(), request.getCharacterEncoding(), request.getContentLengthLong(), requestUri, content));
   }
 
-  private void logHTTPResponse(String requestUri, ContentCachingResponseWrapper response, long cost) {
+  private void logHTTPResponse(String traceId, String requestUri, ContentCachingResponseWrapper response, long cost) {
     String content = getContent(response);
-    log.info(String.format("HttpResponse[%s][%s]:%s %dms %s", response.getStatus(), response.getContentType(), requestUri, cost, content));
+    log.info(String.format("HttpResponse[%s][%s][%s]:%s %dms %s", traceId, response.getStatus(), response.getContentType(), requestUri, cost, content));
   }
 
 
@@ -157,14 +178,6 @@ public class WebTraceFilter extends OncePerRequestFilter implements OrderedFilte
   private String handleApplicationJSON(ContentCachingResponseWrapper response) {
     String encoding = StrUtil.emptyToDefault(response.getCharacterEncoding(), StandardCharsets.UTF_8.name());
     return new String(response.getContentAsByteArray(), Charset.forName(encoding));
-  }
-
-  private void noException(Runnable runnable) {
-    try {
-      runnable.run();
-    } catch (Throwable t) {
-      log.warn("日志打印失败，不影响调用, {}", t.getMessage());
-    }
   }
 
   @Override
